@@ -8,6 +8,15 @@
 %   Pt2 cols  4: 6 = Neck base
 %   Pt3 cols  7: 9 = Tail base
 %   Pt9 cols 25:27 = estimated accelerometer position on the duck
+%   Pt10 cols 28:30, Pt11 cols 31:33 = OPTIONAL, two sharp points on the
+%                    logger itself (e.g. its front and back corner).
+%                    Where BOTH are digitized, their midpoint replaces Pt9
+%                    (less digitizing noise; same acceleration, the logger
+%                    is rigid). It is shifted by the mean offset Pt9 -
+%                    midpoint over the frames that have both, so the
+%                    position (and the distance to the magnet) stays on Pt9.
+%                    The distance Pt10-Pt11 must be constant: its SD is
+%                    printed as the digitizing precision (devInfo).
 %   Magnet file     = 2 corners of the magnet (pt1, pt2), same for all
 %                     underwater trials (cameras did not move)
 %
@@ -21,7 +30,8 @@
 %   Neck is used first (closer to the accelerometer = smaller error),
 %   tail base only where the neck is missing.
 %
-%   src (per frame): 0 = no data, 1 = Pt9 digitized (or short gap filled),
+%   src (per frame): 0 = no data, 1 = Pt9 (or Pt10/Pt11 midpoint, see
+%                    fromDev) digitized (or short gap filled),
 %                    2 = estimated from neck, 3 = estimated from tail base
 %
 % Magnet:
@@ -59,12 +69,14 @@ close all
 FR = 250;           % filming rate, fps
 maxGap = 5;         % fill NaN gaps up to this many frames (linear)
 smoothWin = 7;      % gaussian smoothing window, frames (~28 ms) ; 0 = off
-nOff = 3;           % frames (nearest the gap) used for the neck/tail offset
+nOff = 7;           % frames (nearest the gap) used for the neck/tail offset
                     % small = the extension joins Pt9 without a jump.
                     % (15 gave jumps of up to 4 cm at the seam, because
                     %  the offset slowly changes as the body moves)
 maxSeam = 3;        % warn if the jump at a seam > maxSeam x normal step
 useRefs = true;     % extend Pt9 using neck / tail base
+useDev  = true;     % use Pt10 + Pt11 (2 sharp points on the logger) where digitized
+devCols = {28:30, 31:33};   % Pt10, Pt11 columns in the xyzpts file
 edgeFrames = 3;     % min this close to the start/end of the data = suspicious
 nFit = 35;          % frames for the linear fit of s(t) (90 deg crossing)
                     % (tested: 15 -> mean err 2.9 / max 7.2 frames,
@@ -241,6 +253,66 @@ for i = 1:numel(FN)
     % --- Pt9 as digitized (gaps filled, smoothed) ---
     Praw = A(:, 25:27);
     [P9, a9, b9] = cleanPoint(Praw, maxGap, smoothWin);
+
+    % --- Pt10 + Pt11 on the logger: midpoint replaces Pt9 where both exist ---
+    fromDev = false(nF, 1);
+    devInfo = struct('nFrames', 0, 'offset', [NaN NaN NaN], 'nOverlap', 0, ...
+                     'distMean_mm', NaN, 'distSD_mm', NaN, 'seamMax_mm', NaN, ...
+                     'nOnlyPt10', 0, 'nOnlyPt11', 0);
+    if useDev && size(A, 2) >= devCols{2}(end)
+        D10 = cleanPoint(A(:, devCols{1}), maxGap, smoothWin);
+        D11 = cleanPoint(A(:, devCols{2}), maxGap, smoothWin);
+        both = ~isnan(D10(:,1)) & ~isnan(D11(:,1));
+        if nnz(both) >= 3
+            Pd = (D10 + D11) ./ 2;
+            % precision: raw distance between the 2 points (rigid logger)
+            dRaw = vecnorm(A(:, devCols{1}) - A(:, devCols{2}), 2, 2);
+            devInfo.distMean_mm = 1000 * mean(dRaw, 'omitnan');
+            devInfo.distSD_mm   = 1000 * std(dRaw, 'omitnan');
+            ov = both & ~isnan(P9(:,1));
+            if nnz(ov) >= 3
+                dOff = mean(P9(ov,:) - Pd(ov,:), 1);
+            else
+                dOff = [0 0 0];
+                fprintf('%-24s NOTE: Pt10/Pt11 do not overlap Pt9 - midpoint used without offset\n', FN{i});
+            end
+            P9old = P9;
+            P9(both,:) = Pd(both,:) + dOff;
+            fromDev = both;
+            % only ONE of the two visible: that point + its mean offset to the
+            % (Pt9-aligned) midpoint, measured on the frames that have both
+            nOne = [0 0];
+            Dq = {D10, D11};
+            for q = 1:2
+                only = ~isnan(Dq{q}(:,1)) & ~both;
+                if any(only)
+                    qOff = mean(Pd(both,:) + dOff - Dq{q}(both,:), 1);
+                    P9(only,:) = Dq{q}(only,:) + qOff;
+                    fromDev = fromDev | only;
+                    nOne(q) = nnz(only);
+                end
+            end
+            devInfo.nOnlyPt10 = nOne(1);
+            devInfo.nOnlyPt11 = nOne(2);
+            % jump where the logger points meet the old Pt9 (should be ~noise)
+            k  = find(fromDev(1:end-1) ~= fromDev(2:end) & ...
+                      ~isnan(P9old(1:end-1,1)) & ~isnan(P9old(2:end,1)));   % seam between k and k+1
+            jm = vecnorm(P9(k+1,:) - P9(k,:), 2, 2);
+            devInfo.nFrames = nnz(both);
+            devInfo.offset = dOff;
+            devInfo.nOverlap = nnz(ov);
+            if ~isempty(jm), devInfo.seamMax_mm = 1000 * max(jm); end
+            a9 = find(~isnan(P9(:,1)), 1, 'first');
+            b9 = find(~isnan(P9(:,1)), 1, 'last');
+            stepOld = 1000 * median(vecnorm(diff(P9old), 2, 2), 'omitnan');   % normal step per frame
+            if any(nOne)
+                fprintf('%-24s single logger point used on %d frames (only Pt10) + %d (only Pt11)\n', FN{i}, nOne(1), nOne(2));
+            end
+            fprintf(['%-24s Pt10/Pt11 midpoint on %d frames | Pt10-Pt11 = %.1f +- %.1f mm (SD = digitizing precision) | ' ...
+                     'offset to Pt9 %.1f mm | max jump at seam %.1f mm (normal step %.1f mm)\n'], ...
+                FN{i}, devInfo.nFrames, devInfo.distMean_mm, devInfo.distSD_mm, 1000*norm(dOff), devInfo.seamMax_mm, stepOld);
+        end
+    end
     P = P9;
     src = zeros(nF, 1);
     src(~isnan(P(:,1))) = 1;
@@ -356,6 +428,8 @@ for i = 1:numel(FN)
     MagUnN(i).P       = P;          % accelerometer position (incl. estimated)
     MagUnN(i).Praw    = Praw;       % Pt9 as digitized
     MagUnN(i).src     = src;        % 0 none,1 Pt9,2 neck,3 tail
+    MagUnN(i).fromDev = fromDev;    % true = frame uses the Pt10/Pt11 midpoint (src is 1 there)
+    MagUnN(i).devInfo = devInfo;    % Pt10/Pt11 use + precision (mm)
     MagUnN(i).offInfo = offInfo;    % offsets used + fit error (m)
     MagUnN(i).seamJump = seamJ;     % jump at [start end] seam, m (NaN = none)
     MagUnN(i).stepMed  = stepMed;   % typical Pt9 step per frame, m

@@ -46,6 +46,8 @@ cutHz      = 10;    % low-pass cutoff (Hz), 4th-order Butterworth, zero-phase.
                     % digitizing errors become huge in acceleration otherwise)
                     % and, for a fair comparison, to the accelerometer too.
                     % Smaller = smoother, but real fast changes are lost.
+padFrames  = 60;    % frames added at each end of the track before filtering (edge fix)
+padFit     = 15;    % frames at each end used to fit the straight-line continuation
 axisMode   = 'mean';  % 'mean'     = ONE forward direction per trial: the mean
                      %              tail->neck direction (as BoL in HemiduckUnN2).
                      %              Stable: no wobble that drags lateral (Y)
@@ -117,8 +119,22 @@ for i = 1:size(PP, 1)
     % filter only from the first to the last frame that has data. (Filling
     % the ends with a constant made the duck "stop" there, which showed up
     % as a huge false deceleration at the end of each recording.)
+    % Edge fix: before filtering, the track is continued padFrames frames at
+    % each end as a straight line fitted to its first / last padFit frames
+    % (constant speed). Without it the filter bends the last frames, which
+    % showed up as a false -15..-30 m/s^2 drop at the end of every track,
+    % often inside the power phase (tested: power-phase mean error with the
+    % track ending right after the power phase 1.9 -> 0.35 m/s^2).
     seg = find(okP, 1) : find(okP, 1, 'last');
-    P(seg, :) = filtfilt(bV, aV, fillmissing(P(seg, :), 'linear'));
+    Xs  = fillmissing(P(seg, :), 'linear');
+    nS  = size(Xs, 1);
+    nFit = min(padFit, nS);
+    t0 = (1:nFit)';          c0 = [t0 ones(nFit, 1)] \ Xs(1:nFit, :);
+    t1 = (nS-nFit+1:nS)';    c1 = [t1 ones(nFit, 1)] \ Xs(end-nFit+1:end, :);
+    pre  = [(-padFrames+1:0)'        ones(padFrames, 1)] * c0;
+    post = [(nS+1:nS+padFrames)'     ones(padFrames, 1)] * c1;
+    Xf = filtfilt(bV, aV, [pre; Xs; post]);
+    P(seg, :) = Xf(padFrames+1 : padFrames+nS, :);
     P(~okP, :) = NaN;
     Vv = zeros(nF, 3);  Av = zeros(nF, 3);
     for k = 1:3
@@ -167,7 +183,9 @@ for i = 1:size(PP, 1)
         aVidFit = NaN;
     end
     dvVidFit = aVidFit * T;
-    fracPt9  = mean(V.src(w) == 1);        % share of frames on real Pt9
+    fracPt9  = mean(V.src(w) == 1);        % share of frames on real Pt9 (or Pt10/Pt11 midpoint)
+    fracDev  = 0;                          % share of frames on the Pt10/Pt11 midpoint
+    if isfield(V, 'fromDev') && ~isempty(V.fromDev), fracDev = mean(V.fromDev(w)); end
     nanVid   = nnz(isnan(aVid(w)));
 
     %% ---- LOGGER: forward acceleration at the same moments ----
@@ -253,6 +271,7 @@ for i = 1:size(PP, 1)
     C.imuShiftMax = max(mShift);
     C.rShape     = rShape;
     C.fracPt9    = fracPt9;      % 1 = whole window on digitized Pt9
+    C.fracDev    = fracDev;      % 1 = whole window on the Pt10/Pt11 midpoint
     C.nanVid     = nanVid;
     if isempty(Cmp), Cmp = C; else, Cmp(end+1) = C; end %#ok<AGROW>
 
