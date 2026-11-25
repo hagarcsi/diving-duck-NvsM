@@ -1,0 +1,54 @@
+video,imuFile,peakTime_s,peakClock,notebook,swim,videoDir,peakB,note
+duck1round01xyzpts.csv,Yosef1duck1_S1.csv,428.37,07:08.37,R1F1,E->W,+X,373,
+duck1round02xyzpts.csv,Yosef1duck1_S1.csv,477.98,07:57.98,R1F2,W->E,-X,2010,
+duck1round03xyzpts.csv,Yosef1duck1_S1.csv,526.89,08:46.89,R1F3,E->W,+X,253,
+duck1round04xyzpts.csv,Yosef1duck1_S1.csv,556.57,09:16.57,R1F4,W->E,-X,1300,
+duck1round05xyzpts.csv,Yosef1duck1_S1.csv,581.48,09:41.48,R1F5,E->W,+X,212,
+duck1round06xyzpts.csv,Yosef1duck1_S1.csv,607.68,10:07.68,R1F6,W->E,-X,1436,
+duck1round07xyzpts.csv,Yosef1duck1_S1.csv,1108.52,18:28.52,R2F1,W->E,-X,1709,
+duck1round08xyzpts.csv,Yosef1duck1_S1.csv,1149.11,19:09.11,R2F2,E->W,+X,477,
+duck1round09xyzpts.csv,Yosef1duck1_S1.csv,1174.36,19:34.36,R2F3,W->E,-X,2240,
+duck1round10xyzpts.csv,Yosef1duck1_S1.csv,1201.08,20:01.08,R2F4,E->W,+X,640,
+duck1round11xyzpts.csv,Yosef1duck1_S1.csv,1225.73,20:25.73,R2F5,W->E,-X,2149,
+duck1round12xyzpts.csv,Yosef1duck1_S1.csv,1258.06,20:58.06,R2F6,E->W,+X,328,
+duck3round01xyzpts.csv,Yosef2duck3_S1.csv,355.83,05:55.83,R1 (pass 1 of 5),W->E?,-X?,181,"duck3 round 1: 5 passes, 4 good films - direction per notebook (all ->) not certain for every pass"
+duck3round02xyzpts.csv,Yosef2duck3_S1.csv,512.66,08:32.66,R1 (pass 2 of 5),W->E?,-X?,566,"duck3 round 1: 5 passes, 4 good films - direction per notebook (all ->) not certain for every pass"
+duck3round03xyzpts.csv,Yosef2duck3_S1.csv,889.43,14:49.43,R1 (pass 3 of 5),W->E?,-X?,313,"duck3 round 1: 5 passes, 4 good films - direction per notebook (all ->) not certain for every pass"
+duck3round04xyzpts.csv,Yosef2duck3_S1.csv,1056.42,17:36.42,R1 (pass 4 of 5),W->E?,-X?,360,"duck3 round 1: 5 passes, 4 good films - direction per notebook (all ->) not certain for every pass"
+duck3round05xyzpts.csv,Yosef2duck3_S1.csv,1200.54,20:00.54,R1 (pass 5 of 5),W->E?,-X?,419,"duck3 round 1: 5 passes, 4 good films - direction per notebook (all ->) not certain for every pass"
+duck3round06xyzpts.csv,Yosef1duck3_S1.csv,327.44,05:27.44,R2F1,W->E,-X,904,duck3 round 2 = rounds 06-11 (round 1 = 5 passes -> rounds 01-05)
+duck3round07xyzpts.csv,Yosef1duck3_S1.csv,485.43,08:05.43,R2F2,E->W,+X,548,duck3 round 2 = rounds 06-11 (round 1 = 5 passes -> rounds 01-05)
+duck3round08xyzpts.csv,Yosef1duck3_S1.csv,566.37,09:26.37,R2F3,W->E,-X,358,duck3 round 2 = rounds 06-11 (round 1 = 5 passes -> rounds 01-05)
+duck3round09xyzpts.csv,Yosef1duck3_S1.csv,710.5,11:50.50,R2F4,E->W,+X,580,duck3 round 2 = rounds 06-11 (round 1 = 5 passes -> rounds 01-05)
+duck3round10xyzpts.csv,Yosef1duck3_S1.csv,767.07,12:47.07,R2F5,W->E,-X,469,duck3 round 2 = rounds 06-11 (round 1 = 5 passes -> rounds 01-05)
+duck3round11xyzpts.csv,Yosef1duck3_S1.csv,851.39,14:11.39,R2F6,E->W,+X,913,duck3 round 2 = rounds 06-11 (round 1 = 5 passes -> rounds 01-05)
+duck4round01xyzpts.csv,Yosef2duck4_S1.csv,299.92,04:59.92,R1F1,W->E,-X,2081,
+duck4round02xyzpts.csv,Yosef2duck4_S1.csv,376.26,06:16.26,R1F2,E->W,+X,438,
+duck4round03xyzpts.csv,Yosef2duck4_S1.csv,406.9,06:46.90,R1F3,W->E,-X,1179,
+duck4round04xyzpts.csv,Yosef2duck4_S1.csv,452.34,07:32.34,R1F4,E->W,+X,462,
+duck4round05xyzpts.csv,Yosef2duck4_S1.csv,482.66,08:02.66,R1F5,W->E,-X,1672,
+duck4round06xyzpts.csv,Yosef2duck4_S1.csv,532.05,08:52.05,R1F6,E->W,+X,451,
+duck4round07xyzpts.csv,Yosef2duck4_S1.csv,1351.1,22:31.10,R2F1,E->W,+X,1095,
+duck4round08xyzpts.csv,Yosef2duck4_S1.csv,1562.95,26:02.95,R2F2,W->E,-X,854,
+duck4round09xyzpts.csv,Yosef2duck4_S1.csv,1645.07,27:25.07,R2F3,E->W,+X,943,
+duck4round10xyzpts.csv,Yosef2duck4_S1.csv,1706.62,28:26.62,R2F4,W->E,-X,2963,
+duck4round11xyzpts.csv,Yosef2duck4_S1.csv,1788.43,29:48.43,R2F5,E->W,+X,484,
+duck4round12xyzpts.csv,Yosef2duck4_S1.csv,1832.09,30:32.09,R2F6,W->E,-X,1935,
+duck5round01xyzpts.csv,Yosef1duck5_S1.csv,340.88,05:40.88,R1F1,W->E,-X,533,
+duck5round02xyzpts.csv,Yosef1duck5_S1.csv,836.84,13:56.84,R1F2,W->E,-X,1254,
+duck5round03xyzpts.csv,Yosef1duck5_S1.csv,870.77,14:30.77,R1F3,E->W,+X,471,
+duck5round04xyzpts.csv,Yosef1duck5_S1.csv,912.65,15:12.65,R1F4,W->E,-X,2073,
+duck5round05xyzpts.csv,Yosef1duck5_S1.csv,1018.52,16:58.52,R1F5,E->W,+X,326,
+duck5round06xyzpts.csv,Yosef1duck5_S1.csv,1071.78,17:51.78,R1F6,W->E,-X,389,
+duck5round07xyzpts.csv,Yosef1duck5_S1.csv,1519.37,25:19.37,R2F1,E->W,+X,302,
+duck5round08xyzpts.csv,Yosef1duck5_S1.csv,1556.82,25:56.82,R2F2,W->E,-X,1520,
+duck5round09xyzpts.csv,Yosef1duck5_S1.csv,1600.77,26:40.77,R2F3,E->W,+X,415,
+duck5round10xyzpts.csv,Yosef1duck5_S1.csv,1654.41,27:34.41,R2F4,W->E,-X,473,
+duck5round11xyzpts.csv,Yosef1duck5_S1.csv,1715.13,28:35.13,R2F5,E->W,+X,475,
+duck5round12xyzpts.csv,Yosef1duck5_S1.csv,1753.49,29:13.49,R2F6,W->E,-X,535,
+duck5round13xyzpts.csv,Yosef1duck5_S1.csv,2473.16,41:13.16,R3F1,E->W,+X,341,
+duck5round14xyzpts.csv,Yosef1duck5_S1.csv,2509.96,41:49.96,R3F2,W->E,-X,1146,
+duck5round15xyzpts.csv,Yosef1duck5_S1.csv,2545.15,42:25.15,R3F3,E->W,+X,275,
+duck5round16xyzpts.csv,Yosef1duck5_S1.csv,2584.4,43:04.40,R3F4,W->E,-X,1109,
+duck5round17xyzpts.csv,Yosef1duck5_S1.csv,2653.06,44:13.06,R3F5,E->W,+X,276,
+duck5round18xyzpts.csv,Yosef1duck5_S1.csv,2691.09,44:51.09,R3F6,W->E,-X,1050,
